@@ -3,7 +3,8 @@ import time
 from stable_baselines3 import PPO
 
 env = gym.make('LunarLander-v3', render_mode='human')
-model = PPO.load('./ppo-moon_lander.zip', env)
+# model = PPO.load('./ppo-moon_lander.zip', env)
+model = PPO.load('./ppo-moon_lander.zip')
 
 
 while True:

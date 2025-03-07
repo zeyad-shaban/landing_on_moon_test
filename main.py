@@ -11,48 +11,13 @@ import os
 env = make_vec_env('LunarLander-v3', 16)
 
 
-class CustomNetwork(nn.Module):
-    def __init__(self, in_channels, out_channels, last_layer_dim=64):
-        super().__init__()
-
-        self.latent_dim_pi = last_layer_dim
-        self.latent_dim_vf = last_layer_dim
-
-        self.feature_extractor = nn.Sequential(
-            nn.Linear(in_channels, last_layer_dim),
-            nn.ReLU(),
-        )
-
-        self.policy_head = nn.Linear(last_layer_dim, out_channels)
-
-        self.critic_head = nn.Linear(last_layer_dim, 1)
-
-    def forward(self, x):
-        features = self.feature_extractor(x)
-        return features, features
-
-    def forward_actor(self, x):
-        return self.policy_head(x)
-
-    def forward_critic(self, x):
-        return self.critic_head(x)
-
-
-class CustomPolicy(ActorCriticPolicy):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def _build_mlp_extractor(self):
-        self.mlp_extractor = CustomNetwork(self.features_dim, self.action_space.n)
-
-
 model = None
 if os.path.exists('./ppo-moon_lander.zip'):
     model = PPO.load('./ppo-moon_lander.zip', env)
     model.verbose = 0
 else:
     model = PPO(
-        CustomPolicy,
+        'MlpPolicy',
         env,
         verbose=1,
         n_steps=1024,  # default 2048
